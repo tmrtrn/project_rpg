@@ -1,15 +1,32 @@
 using System;
-using System.Collections;
-using Core.Services.Async;
+using Core.Services.Logging;
 using UnityEngine;
 
 namespace Core.Services
 {
-    /// <summary>
-    /// Register services before accessing the services
-    /// </summary>
     public class ServiceManager : MonoBehaviour
     {
+        private IGameStateService _gameStateService;
 
+        public void RegisterGameStateService(IGameStateService gameStateService)
+        {
+            _gameStateService = gameStateService;
+        }
+
+        private void Start()
+        {
+            Log.Info("Service manger starting...");
+            _gameStateService.Start();
+        }
+
+        private void Update()
+        {
+            _gameStateService.Update();
+        }
+
+        private void OnDestroy()
+        {
+            _gameStateService.Stop();
+        }
     }
 }

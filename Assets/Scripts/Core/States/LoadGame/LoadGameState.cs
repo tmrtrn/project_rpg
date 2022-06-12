@@ -40,7 +40,8 @@ namespace Core.States.LoadGame
             {
                 if (++calls == waits.Length)
                 {
-                    Log.Info( "Prerequisites received. ");
+                    Log.Info( "all pre requires received. ");
+                    _eventDispatcher.Publish(new LoadingCompletedEvent());
                 }
                 else
                 {
@@ -54,8 +55,9 @@ namespace Core.States.LoadGame
                 waits[i](callback);
             }
 
-            _sceneService.LoadScene("main");
+            _sceneService.LoadScene("Main");
             _gameController.PreloadAssets();
+            _gameController.GenerateRuntimeData();
         }
 
         private void WaitForAssets(Action callback)

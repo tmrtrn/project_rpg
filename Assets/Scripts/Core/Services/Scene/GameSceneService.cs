@@ -3,6 +3,7 @@ using System.Collections;
 using Core.Events;
 using Core.Services.Async;
 using Core.Services.Event;
+using Core.Services.Logging;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -26,10 +27,18 @@ namespace Core.Services.Scene
 
         public void LoadScene(string scene)
         {
-            _asyncService.BootstrapCoroutine(LoadSceneAsync(scene), () =>
+            try
             {
-                _eventService.Publish(new SceneLoaded(scene));
-            });
+                _asyncService.BootstrapCoroutine(LoadSceneAsync(scene), () =>
+                {
+                    _eventService.Publish(new SceneLoaded(scene));
+                });
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"An exception is occured while loading scene {scene}", ex);
+                throw ex;
+            }
         }
 
         /// <summary>

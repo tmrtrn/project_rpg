@@ -14,10 +14,6 @@ namespace Data.Hero
         private int _health;
         [SerializeField]
         private int _attack;
-        [SerializeField]
-        private int _experience;
-        [SerializeField]
-        private int _level;
         #endregion
 
         #region Public Implementation
@@ -29,9 +25,6 @@ namespace Data.Hero
 
         public int Attack => _attack;
 
-        public int Experience => _experience;
-
-        public int Level => _level;
 
         #endregion
     }

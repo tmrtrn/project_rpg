@@ -9,5 +9,7 @@ namespace Core.Services.Data
     public interface IGameDataService : IService
     {
         IEnumerable<T> LoadResourceGameAsset<T>(string path) where T : Object;
+        void SaveModel(string key, ISerializeModel model);
+        bool ReadModel<T>(string key, out T model) where T : ISerializeModel;
     }
 }

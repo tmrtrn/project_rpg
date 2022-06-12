@@ -8,7 +8,7 @@ namespace Core.Services.Async
     {
         public void BootstrapCoroutine(IEnumerator coroutine, Action callback = null)
         {
-            WaitCoroutine(coroutine, callback);
+            StartCoroutine(WaitCoroutine(coroutine, callback));
         }
 
         public void Wait(float milliseconds, Action callback)
