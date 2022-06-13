@@ -14,11 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _id: 2fa40f75-86ab-49be-bd46-9ca8f2d9e5c9
   _attributes:
-    _name: Spawn
-    _health: 1
-    _attack: 1
-    _experience: 0
-    _level: 0
+    _name: Pyro
+    _health: 96
+    _attack: 37
   _viewAsset:
-    _view: {fileID: 21300000, guid: 21995c28efbbc473da1d30fdead612d6, type: 3}
-    _color: {r: 0.9013611, g: 0.21513164, b: 0.69876575, a: 1}
+    _view: {fileID: 21300000, guid: 39a74d416ae554cfba09c1cb7e19e798, type: 3}
+    _color: {r: 0.5436805, g: 0.6464026, b: 0.86485946, a: 1}

@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Constants;
 using Core.Events;
 using Core.Services.Data;
 using Core.Services.Event;
 using Core.Services.Logging;
 using Data.Hero;
-using DefaultNamespace;
 using Models;
 using Utils;
 
@@ -17,6 +17,9 @@ namespace Core
         private readonly IGameDataService _dataService;
         private readonly IEventDispatcher _eventDispatcher;
 
+        /// <summary>
+        /// Keeps all hero assets
+        /// </summary>
         private Dictionary<string, IHeroAsset> _heroAssets;
         private RuntimeGameModel _runtimeGame;
 
@@ -92,7 +95,7 @@ namespace Core
             int requiredHeroCountToFight = Math.Min(GameConstants.InitialHeroCount, allHeroIds.Count);
 
             // create a empty team for player
-            savedGameModel.playerTeam = new HeroTeam(requiredHeroCountToFight);
+            savedGameModel.playerTeam = new string[requiredHeroCountToFight];
 
 
             return savedGameModel;
@@ -116,6 +119,42 @@ namespace Core
         public bool GetHeroAssetById(string id, out IHeroAsset heroData)
         {
             return _heroAssets.TryGetValue(id, out heroData);
+        }
+
+
+        /// <summary>
+        /// Gets a random asset different than player's inventory
+        /// If there is no different hero, just picks a random hero and returns false
+        /// </summary>
+        /// <param name="excludePlayerTeam"></param>
+        /// <param name="excludeEnemyTeam"></param>
+        /// <param name="asset"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public bool GetRandomHeroAsset(bool excludePlayerTeam, bool excludeEnemyTeam, out IHeroAsset asset)
+        {
+            if (_heroAssets.Count == 0) throw new Exception("create a hero asset in resources folder first");
+            List<string> allHeroIds = _heroAssets.Keys.ToList();
+            RandomUtil.Shuffle(allHeroIds);
+
+            for (int i = 0; i < allHeroIds.Count; i++)
+            {
+                if ((!excludePlayerTeam || !_runtimeGame.IsHeroInPlayerTeam(allHeroIds[i])) &&
+                    (!excludeEnemyTeam || !_runtimeGame.IsHeroInEnemyTeam(allHeroIds[i])))
+                {
+                    // we found
+                    return GetHeroAssetById(allHeroIds[i], out asset);
+                }
+            }
+            // all hero assets are listing in player team or enemy team
+            // just pick a random asset and return false
+            GetHeroAssetById(allHeroIds[0], out asset);
+            return false;
+        }
+
+        public void CreateNewBattle()
+        {
+
         }
 
 

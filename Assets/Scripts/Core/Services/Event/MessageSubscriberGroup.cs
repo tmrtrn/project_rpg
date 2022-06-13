@@ -104,7 +104,7 @@ namespace Core.Services.Event
                 }
                 catch (Exception exception)
                 {
-                    Log.Error($"Exception while publishing the message {MessageType}", exception);
+                    Log.Error($"Exception while publishing the message {MessageType}", exception.Message);
                 }
             }
 

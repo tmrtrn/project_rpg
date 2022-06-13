@@ -1,6 +1,6 @@
 using System;
+using Constants;
 using Data.Hero;
-using DefaultNamespace;
 
 namespace Models
 {
@@ -36,8 +36,35 @@ namespace Models
             return _heroAsset.Attributes.Attack * ((Level - 1) * GameConstants.IncreaseAttackPerLevel);
         }
 
-        public float FullAttack => _heroAsset.Attributes.Attack + GetAttackBuffByLevel();
-
+        public float AttackByLevel => _heroAsset.Attributes.Attack + GetAttackBuffByLevel();
         public int Experience => _savedHero.experience;
+
+        public float GetCurrentHp()
+        {
+            return _savedHero.battleHp;
+        }
+
+        public bool IsDied()
+        {
+            return _savedHero.battleHp <= 0;
+        }
+
+        public void ResetHpForBattle()
+        {
+            _savedHero.battleHp = FullHealth;
+        }
+
+        public float Attack(HeroModel target)
+        {
+            float damage = AttackByLevel;
+            target.Damage(damage);
+            return damage;
+        }
+
+
+        private void Damage(float damage)
+        {
+            _savedHero.battleHp = Math.Max(0, _savedHero.battleHp - damage);
+        }
     }
 }

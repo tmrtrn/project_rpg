@@ -96,5 +96,10 @@ namespace Renders
                 _eventService.Publish(new HeroCardInputEvent(HeroCardInputEvent.InputType.Hold, this));
             }
         }
+
+        protected Image GetAvatarImage()
+        {
+            return _avatar;
+        }
     }
 }

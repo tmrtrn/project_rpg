@@ -6,7 +6,7 @@ namespace Models
         public string Name { get; }
         public int Level { get; }
         public float FullHealth { get; }
-        public float FullAttack { get; }
+        public float AttackByLevel { get; }
         public int Experience { get; }
     }
 }

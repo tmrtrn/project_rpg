@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c43dc596e7849c18365498e95b6296a, type: 3}
+  m_Name: Hero_4
+  m_EditorClassIdentifier: 
+  _id: af85930c-9462-4e66-8687-332d91ec8934
+  _attributes:
+    _name: Arclight
+    _health: 85
+    _attack: 27
+  _viewAsset:
+    _view: {fileID: 21300000, guid: 69f9ae27d11354333845a3d25ab60be7, type: 3}
+    _color: {r: 0.71884, g: 0.686829, b: 0.43597776, a: 1}

@@ -55,9 +55,9 @@ namespace Core.States.LoadGame
                 waits[i](callback);
             }
 
-            _sceneService.LoadScene("Main");
             _gameController.PreloadAssets();
             _gameController.GenerateRuntimeData();
+            _sceneService.LoadScene("Main");
         }
 
         private void WaitForAssets(Action callback)

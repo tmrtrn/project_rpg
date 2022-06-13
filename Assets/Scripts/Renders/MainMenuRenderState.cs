@@ -2,6 +2,7 @@ using System;
 using Core;
 using Core.Events;
 using Core.Services.Event;
+using Core.Services.Logging;
 using Data.Hero;
 using Models;
 using UnityEngine;
@@ -30,21 +31,24 @@ namespace Renders
         {
             _eventService = eventService;
             _runtimeGameState = runtimeGameState;
+            battleButton.InjectServices(eventService);
         }
-
         public void Enter()
         {
-            foreach (HeroModel heroModel in _runtimeGameState.HeroCollection)
+            foreach (HeroModel heroModel in _runtimeGameState.PlayerHeroCollection)
             {
                 CreateHeroCard(heroModel.GetHeroAsset());
             }
             popupView.Exit();
             UpdateBattleButtonState();
+            battleButton.OnClicked += OnBattleButtonClicked;
         }
+
 
         public void Exit()
         {
             popupView.Exit();
+            battleButton.OnClicked -= OnBattleButtonClicked;
         }
 
         void CreateHeroCard(IHeroAsset asset)
@@ -57,12 +61,25 @@ namespace Renders
 
         public void RenderCardInfoPopup(string heroId)
         {
-            popupView.Render(_runtimeGameState.GetHeroModelAttribute(heroId));
+            popupView.Render(_runtimeGameState.GetPlayerHeroModel(heroId));
         }
 
         public void UpdateBattleButtonState()
         {
             battleButton.SetReady(_runtimeGameState.IsReadyToFight());
+        }
+
+        private void OnBattleButtonClicked()
+        {
+            // check this again
+            if (_runtimeGameState.IsReadyToFight())
+            {
+                _eventService.Publish(new MenuCompletedEvent());
+            }
+            else
+            {
+                Log.Error("Battle button can not be interactible until the team is ready");
+            }
         }
     }
 }

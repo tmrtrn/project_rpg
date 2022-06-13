@@ -18,7 +18,7 @@ namespace Renders
             _name.text = heroAttributes.Name;
             _level.text = $"{heroAttributes.Level}";
             _health.text = heroAttributes.FullHealth.ToString("0.#");
-            _attackPoint.text = heroAttributes.FullAttack.ToString("0.#");
+            _attackPoint.text = heroAttributes.AttackByLevel.ToString("0.#");
             _experience.text = $"{heroAttributes.Experience}";
 
             gameObject.SetActive(true);

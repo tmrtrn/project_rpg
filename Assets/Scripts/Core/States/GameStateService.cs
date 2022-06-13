@@ -4,6 +4,7 @@ using Core.Services;
 using Core.Services.Event;
 using Core.Services.Logging;
 using Core.Services.State;
+using Core.States.Battle;
 using Core.States.Initialize;
 using Core.States.LoadGame;
 using Core.States.MainGame;
@@ -24,6 +25,8 @@ namespace Core.States
 
         private Action _unsubInit;
         private Action _unSunLoading;
+        private Action _unsubBattleReady;
+        private Action _unSubMenuCompleted;
 
         public GameStateService(IEventDispatcher eventDispatcher, IState[] states)
         {
@@ -35,6 +38,8 @@ namespace Core.States
         {
             _unsubInit = _eventDispatcher.Subscribe<GameInitializedEvent>(GameInitialized);
             _unSunLoading = _eventDispatcher.Subscribe<LoadingCompletedEvent>(GameLoadingCompleted);
+            _unSubMenuCompleted = _eventDispatcher.Subscribe<MenuCompletedEvent>(OnMenuCompletedEvent);
+            _unsubBattleReady = _eventDispatcher.Subscribe<BattleSceneLoadedEvent>(BattleIsReady);
             _fsm.Change<InitializeGameState>();
         }
 
@@ -58,10 +63,32 @@ namespace Core.States
             _fsm.Change<MenuState>();
         }
 
+        /// <summary>
+        /// Called when battle button is pressed
+        /// </summary>
+        /// <param name="event"></param>
+        void OnMenuCompletedEvent(MenuCompletedEvent @event)
+        {
+            Log.Info("Ready to load battle");
+            _fsm.Change<LoadBattleState>();
+        }
+
+        /// <summary>
+        /// Called when battle scene is loaded
+        /// </summary>
+        /// <param name="loadedEvent"></param>
+        private void BattleIsReady(BattleSceneLoadedEvent loadedEvent)
+        {
+            Log.Info("Battle is ready");
+            _fsm.Change<BattleState>();
+        }
+
         public void Stop()
         {
             _unsubInit();
             _unSunLoading();
+            _unsubBattleReady();
+            _unSubMenuCompleted();
         }
 
         public void Update()

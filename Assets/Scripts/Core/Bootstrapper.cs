@@ -7,6 +7,7 @@ using Core.Services.Logging;
 using Core.Services.Scene;
 using Core.Services.State;
 using Core.States;
+using Core.States.Battle;
 using Core.States.Initialize;
 using Core.States.LoadGame;
 using Core.States.MainGame;
@@ -37,12 +38,16 @@ namespace Core
             InitializeGameState initializeGameState = new InitializeGameState(eventService);
             LoadGameState loadGameState = new LoadGameState(gameController, sceneService, eventService);
             MenuState menuState = new MenuState(eventService, gameController);
+            LoadBattleState loadBattleState = new LoadBattleState(sceneService, eventService, gameController);
+            BattleState battleState = new BattleState(gameController, eventService, asyncService);
 
             IState[] states = new IState[]
             {
                 initializeGameState,
                 loadGameState,
-                menuState
+                menuState,
+                loadBattleState,
+                battleState
             };
 
             // Game State service controls major states

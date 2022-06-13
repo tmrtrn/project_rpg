@@ -11,5 +11,7 @@ namespace Models
         public int level;
 
         public int experience;
+
+        public float battleHp;
     }
 }
