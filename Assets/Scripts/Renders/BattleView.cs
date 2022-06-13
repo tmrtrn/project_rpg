@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace Renders
 {
-    public class BattleView : MonoBehaviour
+    public class BattleView : MonoBehaviour, IBattleRenderer
     {
         [SerializeField] private GameObject playerHeroCardPrefab;
         [SerializeField] private Transform playerHeroPanel;
@@ -37,7 +37,7 @@ namespace Renders
             _eventService = eventService;
         }
 
-        public void Enter()
+        public void Enter(object context)
         {
             RuntimeGameModel runtimeState = _gameController.GetRuntimeState();
 
@@ -60,7 +60,12 @@ namespace Renders
                 _opponentHeroCards.Add(heroId, card);
             }
 
-            _unSubPlayingStateStarted = _eventService.Subscribe<PlayingStateStartedEvent>(OnPlayingStateStarted);
+            _unSubPlayingStateStarted = _eventService.Subscribe<PlayingStateChangedEvent>(OnPlayingStateChanged);
+        }
+
+        public void UpdateState(float deltaTime)
+        {
+
         }
 
         IHeroBattleCardView CreatePlayerHeroCard(HeroModel heroModel)
@@ -79,9 +84,16 @@ namespace Renders
             return card;
         }
 
-        void OnPlayingStateStarted(PlayingStateStartedEvent @event)
+        void OnPlayingStateChanged(PlayingStateChangedEvent @event)
         {
-            turnText.text = @event.isPlayerTurn ? "YOUR TURN" : "OPPONENT TURN";
+            if (@event.isGameOver)
+            {
+                turnText.text = "PROCESSING RESULT";
+            }
+            else
+            {
+                turnText.text = @event.isPlayerTurn ? "YOUR TURN" : "OPPONENT TURN";
+            }
         }
 
         public void Exit()

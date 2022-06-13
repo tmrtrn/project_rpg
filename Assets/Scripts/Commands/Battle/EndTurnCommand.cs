@@ -1,9 +1,11 @@
+using System.Collections;
 using System.Collections.Generic;
 using Core.Events.GameEvents;
 using Core.Services.Command;
 using Core.States.Battle;
 using Core.States.Battle.SubStates;
 using Models;
+using UnityEngine;
 
 namespace Commands.Battle
 {
@@ -39,7 +41,7 @@ namespace Commands.Battle
             // check the game is over
             if (gameState.IsGameOver())
             {
-                _battleState.ChangeState<GameResultState>();
+                _battleState.AsyncService.BootstrapCoroutine(MoveToResultGame());
                 return;
             }
 
@@ -51,12 +53,21 @@ namespace Commands.Battle
             // TODO: Call UI end turn animations
 
             // update whois turn over screen
-            _battleState.EventService.Publish(new PlayingStateStartedEvent(gameState.IsPlayerTurn()));
+            _battleState.EventService.Publish(new PlayingStateChangedEvent(gameState.IsPlayerTurn(), false));
 
             CmdState = CommandState.Completed;
         }
 
         public CommandState CmdState { get; set; }
         public List<ICommandItem> ChildCommands { get; set; }
+
+        private IEnumerator MoveToResultGame()
+        {
+            _battleState.EventService.Publish(new PlayingStateChangedEvent(false, true));
+            // fake wait processing
+            yield return new WaitForSeconds(1.5f);
+            CmdState = CommandState.Completed;
+            _battleState.ChangeState<GameResultState>();
+        }
     }
 }

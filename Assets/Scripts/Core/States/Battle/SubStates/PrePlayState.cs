@@ -7,7 +7,6 @@ namespace Core.States.Battle.SubStates
 {
     public class PrePlayState : BaseGameState
     {
-        private BattleView _battleView;
         private IBattleState _battleState;
 
         public PrePlayState(IBattleState battleState)
@@ -25,11 +24,6 @@ namespace Core.States.Battle.SubStates
             {
                 runtimeGame.CreateNewBattle();
             }
-
-            _battleView = Object.FindObjectOfType<BattleView>();
-            _battleView.InjectServices(_battleState.GameController, _battleState.EventService);
-
-            _battleView.Enter();
 
             _battleState.ChangeState<PlayingState>();
         }

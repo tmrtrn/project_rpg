@@ -1,3 +1,4 @@
+using System.Collections;
 using Core.Services.Async;
 using Core.Services.Command;
 using Core.Services.Event;
@@ -13,7 +14,9 @@ namespace Core.States.Battle
         IAsyncService AsyncService { get; }
         void ChangeState<T>(object context = null) where T : IState;
         IState CurrentState { get; }
-        BattleView BattleView { get; }
+        IEnumerator AttackToTarget(string targetId, string attacker, bool playerAttack, float damage);
         bool AddCommand(ICommandItem item);
+        void ClearCommands();
+        void ChangeRenderState<T>() where T : IBattleRenderer;
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Core.Events;
 using Core.Services.Async;
 using Core.Services.Command;
@@ -24,7 +25,9 @@ namespace Core.States.Battle
         private readonly IAsyncService _asyncService;
 
         private readonly ICommandWorker _commandWorker;
-        private BattleView _battleView;
+
+        private FiniteStateMachine _fsmRenderer;
+        private IBattleRenderer[] _battleRenderers;
 
         public BattleState(
             GameController gameController,
@@ -45,13 +48,25 @@ namespace Core.States.Battle
             IState[] states = new IState[]
             {
                 new PrePlayState(this),
-                new PlayingState(this, _eventService),
-                new GameResultState()
+                new PlayingState(this),
+                new GameResultState(this)
             };
 
             _fsm = new FiniteStateMachine(states);
 
-            _battleView = Object.FindObjectOfType<BattleView>();
+            _battleRenderers = new IBattleRenderer[]
+            {
+                Object.FindObjectOfType<BattleView>(),
+                Object.FindObjectOfType<GameResultView>()
+            };
+
+            foreach (IBattleRenderer renderer in _battleRenderers)
+            {
+                renderer.InjectServices(_gameController, _eventService);
+                renderer.Exit();
+            }
+
+            _fsmRenderer = new FiniteStateMachine(_battleRenderers);
             _fsm.Change<PrePlayState>();
         }
 
@@ -71,11 +86,16 @@ namespace Core.States.Battle
             return true;
         }
 
+        public void ClearCommands()
+        {
+            _commandWorker.Cancel();
+        }
+
         public override void Exit()
         {
             base.Exit();
             _fsm.Current.Exit();
-            _battleView.Exit();
+            _fsmRenderer.Current?.Exit();
             _commandWorker.Cancel();
         }
 
@@ -90,7 +110,18 @@ namespace Core.States.Battle
 
         public IState CurrentState => _fsm.Current;
 
-        public BattleView BattleView => _battleView;
+        public void ChangeRenderState<T>() where T : IBattleRenderer
+        {
+            _fsmRenderer.Change<T>();
+        }
 
+        public IEnumerator AttackToTarget(string targetId, string attacker, bool playerAttack, float damage)
+        {
+            if (_fsmRenderer.Current is BattleView battleView)
+            {
+                yield return battleView.AttackToTarget(targetId, attacker, playerAttack, damage);
+            }
+            Log.Error($"Can not attack in {_fsmRenderer.Current} render state ");
+        }
     }
 }

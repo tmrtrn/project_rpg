@@ -4,6 +4,7 @@ using Core.Events;
 using Core.Events.GameEvents;
 using Core.Services.Event;
 using Models;
+using Renders;
 
 namespace Core.States.Battle.SubStates
 {
@@ -15,29 +16,26 @@ namespace Core.States.Battle.SubStates
 
         private Action _unsubCardInput;
 
-        public PlayingState(IBattleState battleState, IEventDispatcher eventService)
+        public PlayingState(IBattleState battleState)
         {
             _battleState = battleState;
-            _eventService = eventService;
+            _eventService = _battleState.EventService;
             _gameState = _battleState.GameController.GetRuntimeState();
         }
 
         public override void Enter(object context)
         {
             base.Enter(context);
-            _eventService.Publish(new PlayingStateStartedEvent(_gameState.IsPlayerTurn()));
+            _battleState.ChangeRenderState<BattleView>();
+            _eventService.Publish(new PlayingStateChangedEvent(_gameState.IsPlayerTurn(), false));
             _unsubCardInput = _eventService.Subscribe<HeroCardInputEvent>(OnHeroCardInputEvent);
-        }
-
-        public override void UpdateState(float deltaTime)
-        {
-            base.UpdateState(deltaTime);
         }
 
         public override void Exit()
         {
             base.Exit();
             _unsubCardInput();
+            _battleState.ClearCommands();
         }
 
         void OnHeroCardInputEvent(HeroCardInputEvent inputEvent)

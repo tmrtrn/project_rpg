@@ -12,7 +12,15 @@ namespace Models
     {
         private readonly GameController _gameController;
         private readonly SavedGameModel _savedGameModel;
+
+        /// <summary>
+        /// Player inventory
+        /// </summary>
         public List<HeroModel> PlayerHeroCollection { get; private set; }
+
+        /// <summary>
+        /// creates in battle
+        /// </summary>
         public List<HeroModel> EnemyHeroCollection { get; private set; }
 
         public RuntimeGameModel(SavedGameModel savedGameModel, GameController gameController)
@@ -50,6 +58,24 @@ namespace Models
             return GetHeroModel(id, EnemyHeroCollection);
         }
 
+        /// <summary>
+        /// Checks if hero is in player inventory
+        /// </summary>
+        /// <param name="heroId"></param>
+        /// <returns></returns>
+        public bool IsHeroInCollection(string heroId)
+        {
+            foreach (HeroModel model in PlayerHeroCollection)
+            {
+                if (model.Id.Equals(heroId))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private HeroModel GetHeroModel(string id, List<HeroModel> modelList)
         {
             foreach (HeroModel model in modelList)
@@ -62,20 +88,37 @@ namespace Models
 
             throw new Exception("Hero model with id not found");
         }
-
-
-
-        #region Team Methods
-
-        private void AddHeroToPlayerCollection(IHeroAsset heroAsset, SavedHeroModel savedHeroModel)
+        private HeroModel AddHeroToPlayerCollection(IHeroAsset heroAsset, SavedHeroModel savedHeroModel)
         {
-            if (PlayerHeroCollection.Count == GameConstants.InitialHeroCount)
+            if (PlayerHeroCollection.Count == GameConstants.PlayerCollectionHeroLimit)
             {
-                throw new Exception($"can not exceed the {GameConstants.InitialHeroCount}");
+                throw new Exception($"can not exceed the {GameConstants.PlayerCollectionHeroLimit}");
             }
             HeroModel hero = new HeroModel(heroAsset, savedHeroModel);
             PlayerHeroCollection.Add(hero);
+            return hero;
         }
+
+        /// <summary>
+        /// Finds a new hero model which doesn't exist in player's inventory
+        /// returns success if found
+        /// </summary>
+        /// <returns></returns>
+        public bool GenerateAndAddNewHeroModel(out HeroModel newHeroModel)
+        {
+            if (_gameController.FindNewHeroAssetExceptInventory(out var asset))
+            {
+                SavedHeroModel savedHeroModel = _gameController.CreateSavedHeroData(asset);
+                newHeroModel = AddHeroToPlayerCollection(asset, savedHeroModel);
+                return true;
+            }
+            Log.Warning("Couldn't find any new hero");
+            newHeroModel = null;
+            return false;
+        }
+
+
+        #region Team Methods
 
 
         public string[] GetPlayerTeam()
@@ -196,6 +239,7 @@ namespace Models
             }
 
             _savedGameModel.Reset();
+            SetBattleStarted();
 
             // set whois turn
             _savedGameModel.EndTurn();
@@ -312,6 +356,22 @@ namespace Models
         public bool IsReadyToFight()
         {
             return _savedGameModel.IsPlayerTeamFull();
+        }
+
+        public void SetBattleStarted()
+        {
+            _savedGameModel.IsPlayingBattle = true;
+        }
+
+        public void SetBattleOver()
+        {
+            _savedGameModel.PlayedBattleCount++;
+            _savedGameModel.Reset();
+        }
+
+        public int GetPlayedBattleCount()
+        {
+            return _savedGameModel.PlayedBattleCount;
         }
     }
 }

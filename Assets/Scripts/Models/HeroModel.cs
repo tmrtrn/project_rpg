@@ -39,6 +39,19 @@ namespace Models
         public float AttackByLevel => _heroAsset.Attributes.Attack + GetAttackBuffByLevel();
         public int Experience => _savedHero.experience;
 
+        public bool IncreaseExperience(int amount, int nextLevelExperience)
+        {
+            _savedHero.experience += amount;
+            if (Experience == nextLevelExperience)
+            {
+                _savedHero.experience = 0;
+                _savedHero.level++;
+                return true;
+            }
+
+            return false;
+        }
+
         public float GetCurrentHp()
         {
             return _savedHero.battleHp;

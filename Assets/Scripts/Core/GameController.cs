@@ -92,10 +92,10 @@ namespace Core
                 savedGameModel.heroCollection.Add(CreateSavedHeroData(heroAsset));
             }
 
-            int requiredHeroCountToFight = Math.Min(GameConstants.InitialHeroCount, allHeroIds.Count);
+            int requiredHeroCountInTeam = Math.Min(GameConstants.InitialHeroCount, allHeroIds.Count);
 
             // create a empty team for player
-            savedGameModel.playerTeam = new string[requiredHeroCountToFight];
+            savedGameModel.playerTeam = new string[requiredHeroCountInTeam];
 
 
             return savedGameModel;
@@ -106,7 +106,7 @@ namespace Core
             return _runtimeGame;
         }
 
-        private SavedHeroModel CreateSavedHeroData(IHeroAsset assetObject)
+        public SavedHeroModel CreateSavedHeroData(IHeroAsset assetObject)
         {
             return new SavedHeroModel
             {
@@ -149,6 +149,26 @@ namespace Core
             // all hero assets are listing in player team or enemy team
             // just pick a random asset and return false
             GetHeroAssetById(allHeroIds[0], out asset);
+            return false;
+        }
+
+        public bool FindNewHeroAssetExceptInventory(out IHeroAsset asset)
+        {
+            if (_heroAssets.Count == 0) throw new Exception("create a hero asset in resources folder first");
+            List<string> allHeroIds = _heroAssets.Keys.ToList();
+            RandomUtil.Shuffle(allHeroIds);
+
+            for (int i = 0; i < allHeroIds.Count; i++)
+            {
+                if (!_runtimeGame.IsHeroInCollection(allHeroIds[i]))
+                {
+                    // we found a new hero asset which doesn't exist in player inventory
+                    asset = _heroAssets[allHeroIds[i]];
+                    return true;
+                }
+            }
+
+            asset = null;
             return false;
         }
 

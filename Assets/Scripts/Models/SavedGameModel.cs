@@ -30,7 +30,7 @@ namespace Models
         /// <summary>
         /// Active battle saved data
         /// </summary>
-        public bool IsPlayingBattle { get; private set; }
+        public bool IsPlayingBattle { get; set; }
 
         public int WhoisTurn { get; private set; }
         public int TurnCounter { get; private set; }
@@ -40,6 +40,8 @@ namespace Models
         /// </summary>
         public int Moves { get; private set; }
 
+        public int PlayedBattleCount { get; set; }
+
 
         public void Reset()
         {
@@ -48,6 +50,7 @@ namespace Models
             IsPlayingBattle = false;
             Moves = 0;
         }
+
 
         public bool IsPlayerTeamMember(string id)
         {
