@@ -2,6 +2,7 @@
 
 Unity3d version 2021.3.1f1
 
+Android apk is available at https://drive.google.com/file/d/1R0Xa_erHPrpqBsnXQBWLwB9SWDVuhvL5/view?usp=sharing
 
 # structure
 MVC pattern is used to split the game into model view and controller
