@@ -75,6 +75,9 @@ public class HeroAssetObjectEditor : Editor
         {
             Randomize();
         }
+
+        serializedObject.ApplyModifiedProperties();
+        serializedObject.Update();
     }
 
     private void Randomize()

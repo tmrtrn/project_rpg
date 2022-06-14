@@ -6,6 +6,6 @@ namespace Renders
 {
     public interface IBattleRenderer : IState
     {
-        void InjectServices(GameController gameController, IEventDispatcher eventService);
+        void InjectServices(IGameController gameController, IEventDispatcher eventService);
     }
 }

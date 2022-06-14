@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _id: 36bf084d-7a57-47b1-b49e-5c299f236cec
   _attributes:
-    _name: Mogo
-    _health: 90
-    _attack: 35
+    _name: Medusa
+    _health: 20
+    _attack: 5
   _viewAsset:
-    _view: {fileID: 21300000, guid: 892b998a82ea54e2eb2c1ab500d5aeac, type: 3}
-    _color: {r: 0.7715192, g: 0.5810042, b: 0.3702559, a: 1}
+    _view: {fileID: 21300000, guid: 69f9ae27d11354333845a3d25ab60be7, type: 3}
+    _color: {r: 0.65569377, g: 0.15018332, b: 0.5055159, a: 1}

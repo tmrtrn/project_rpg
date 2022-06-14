@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c43dc596e7849c18365498e95b6296a, type: 3}
-  m_Name: Hero_4
+  m_Name: Hero_8
   m_EditorClassIdentifier: 
-  _id: af85930c-9462-4e66-8687-332d91ec8934
+  _id: 29cf1d09-9b73-455d-a3d7-de1331e183ea
   _attributes:
-    _name: Demogoblin
-    _health: 40
-    _attack: 8
+    _name: Hollow
+    _health: 80
+    _attack: 4
   _viewAsset:
-    _view: {fileID: 21300000, guid: 223b41604d4d449489dbe3c5ffefeaac, type: 3}
-    _color: {r: 0.34045106, g: 0.29165727, b: 0.79663694, a: 1}
+    _view: {fileID: 21300000, guid: 21995c28efbbc473da1d30fdead612d6, type: 3}
+    _color: {r: 0.25799042, g: 0.85923195, b: 0.5405244, a: 1}

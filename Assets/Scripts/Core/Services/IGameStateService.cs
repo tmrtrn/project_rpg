@@ -5,5 +5,7 @@ namespace Core.Services
         void Start();
         void Update();
         void Stop();
+        void ApplicationPause(bool pauseStatus);
+        void ApplicationQuit();
     }
 }

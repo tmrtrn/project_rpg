@@ -6,7 +6,7 @@ namespace Renders
 {
     public interface IHeroBattleCardView
     {
-        void Render(HeroModel heroModel, IEventDispatcher eventService);
+        void Render(HeroModel heroModel, IEventDispatcher eventService, bool isOpponentCard = false);
         void UpdateHealth();
         Transform TargetPoint { get; }
         void Select();

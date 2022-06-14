@@ -13,11 +13,13 @@ namespace Core.Events
 
         public readonly InputType inputType;
         public readonly HeroCardView card;
+        public readonly bool isOpponentCard;
 
-        public HeroCardInputEvent(InputType inputType, HeroCardView card)
+        public HeroCardInputEvent(InputType inputType, HeroCardView card, bool isOpponentCard = false)
         {
             this.inputType = inputType;
             this.card = card;
+            this.isOpponentCard = isOpponentCard;
         }
     }
 }

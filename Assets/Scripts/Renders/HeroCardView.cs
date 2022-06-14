@@ -23,6 +23,8 @@ namespace Renders
         private IEventDispatcher _eventService;
         private float _inputHoldTimeout;
 
+        protected bool isOpponentCard = false;
+
         public void Render(IHeroAsset heroAsset, IEventDispatcher eventService, bool inTeam)
         {
             _assetObject = heroAsset;
@@ -68,7 +70,8 @@ namespace Renders
         /// </summary>
         public void InputDown()
         {
-            _inputHoldTimeout = Time.unscaledTime + HoldTimeThresholdInSec;
+            Log.Debug("Input down");
+            _inputHoldTimeout = Time.time + 3f;
         }
 
         /// <summary>
@@ -80,7 +83,7 @@ namespace Renders
             {
                 _inputHoldTimeout = 0;
                 Log.Info("Input->tap card view");
-                _eventService.Publish(new HeroCardInputEvent(HeroCardInputEvent.InputType.Tap, this));
+                _eventService.Publish(new HeroCardInputEvent(HeroCardInputEvent.InputType.Tap, this, isOpponentCard));
             }
         }
 
@@ -88,12 +91,11 @@ namespace Renders
 
         void Update()
         {
-            // handle hold action
-            if (_inputHoldTimeout > 0 && Time.unscaledTime >= _inputHoldTimeout)
+            if (_inputHoldTimeout > 0 && Time.time > _inputHoldTimeout)
             {
+                Log.Info("Input->hold card view ");
                 _inputHoldTimeout = 0;
-                Log.Info("Input->hold card view");
-                _eventService.Publish(new HeroCardInputEvent(HeroCardInputEvent.InputType.Hold, this));
+                _eventService.Publish(new HeroCardInputEvent(HeroCardInputEvent.InputType.Hold, this, isOpponentCard));
             }
         }
 

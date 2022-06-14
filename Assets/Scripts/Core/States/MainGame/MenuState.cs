@@ -12,13 +12,13 @@ namespace Core.States.MainGame
     {
         private MainMenuRenderState _mainRenderer;
         private readonly IEventDispatcher _eventService;
-        private readonly GameController _gameController;
+        private readonly IGameController _gameController;
 
         private Action _unsubCardInput;
 
         public MenuState(
             IEventDispatcher eventService,
-            GameController gameController)
+            IGameController gameController)
         {
             _eventService = eventService;
             _gameController = gameController;

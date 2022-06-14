@@ -14,6 +14,7 @@ namespace Core
 {
     public sealed class GameController : IGameController
     {
+        private const string SavedStateKey = "player_progress";
         private readonly IGameDataService _dataService;
         private readonly IEventDispatcher _eventDispatcher;
 
@@ -46,9 +47,17 @@ namespace Core
             _eventDispatcher.Publish(new PreLoadAssetsEvent());
         }
 
+        public void SavePlayerProgress()
+        {
+            if (_runtimeGame?.GetSaveFile() != null)
+            {
+                _dataService.SaveModel(SavedStateKey,_runtimeGame.GetSaveFile());
+            }
+        }
+
         public void GenerateRuntimeData()
         {
-            if (_dataService.ReadModel("progress", out SavedGameModel progress))
+            if (_dataService.ReadModel(SavedStateKey, out SavedGameModel progress))
             {
                 try
                 {
@@ -172,11 +181,10 @@ namespace Core
             return false;
         }
 
-        public void CreateNewBattle()
+
+        public bool HasActiveBattle()
         {
-
+            return _runtimeGame.HasActiveBattle();
         }
-
-
     }
 }

@@ -51,7 +51,7 @@ namespace Core
             };
 
             // Game State service controls major states
-            GameStateService gameStateService = new GameStateService(eventService, states);
+            GameStateService gameStateService = new GameStateService(eventService, sceneService, gameController, states);
             Object.FindObjectOfType<ServiceManager>().RegisterGameStateService(gameStateService);
         }
 

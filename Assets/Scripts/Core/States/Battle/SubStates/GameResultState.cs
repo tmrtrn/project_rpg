@@ -33,7 +33,7 @@ namespace Core.States.Battle.SubStates
             // find experienced and leveled up heroes
             List<string> gainExperienceHeroList = new List<string>();
             List<string> levelUpHeroList = new List<string>();
-            string rewardedHero = null;
+            string unlockedHeroId = null;
 
             if (!gameState.IsAnyAliveOpponentMember())
             {
@@ -56,7 +56,7 @@ namespace Core.States.Battle.SubStates
             {
                 if (gameState.GenerateAndAddNewHeroModel(out HeroModel unlockedHero))
                 {
-                    rewardedHero = unlockedHero.Id;
+                    unlockedHeroId = unlockedHero.Id;
                 }
             }
 
@@ -64,7 +64,7 @@ namespace Core.States.Battle.SubStates
                 isPlayerWon,
                 gainExperienceHeroList,
                 levelUpHeroList,
-                rewardedHero);
+                unlockedHeroId);
             _battleState.EventService.Publish(resultEvent);
         }
 

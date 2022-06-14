@@ -9,7 +9,7 @@ namespace Core.States.Battle
 {
     public interface IBattleState
     {
-        GameController GameController { get; }
+        IGameController GameController { get; }
         IEventDispatcher EventService { get; }
         IAsyncService AsyncService { get; }
         void ChangeState<T>(object context = null) where T : IState;

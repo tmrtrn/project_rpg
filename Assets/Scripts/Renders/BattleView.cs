@@ -22,16 +22,20 @@ namespace Renders
         [SerializeField] private TMP_Text turnText;
         [SerializeField] private DamageText _damageText;
 
-        private GameController _gameController;
+        [SerializeField] private GameObject parentCanvas;
+        [SerializeField] private InfoPopUpView popupView;
+
+        private IGameController _gameController;
         private IEventDispatcher _eventService;
 
         private Action _unSubPlayingStateStarted;
+        private Action _unsubCardInput;
 
 
         private Dictionary<string, IHeroBattleCardView> _playerHeroCards;
         private Dictionary<string, IHeroBattleCardView> _opponentHeroCards;
 
-        public void InjectServices(GameController gameController, IEventDispatcher eventService)
+        public void InjectServices(IGameController gameController, IEventDispatcher eventService)
         {
             _gameController = gameController;
             _eventService = eventService;
@@ -39,6 +43,7 @@ namespace Renders
 
         public void Enter(object context)
         {
+            parentCanvas.SetActive(true);
             RuntimeGameModel runtimeState = _gameController.GetRuntimeState();
 
             // instantiate player team
@@ -61,6 +66,7 @@ namespace Renders
             }
 
             _unSubPlayingStateStarted = _eventService.Subscribe<PlayingStateChangedEvent>(OnPlayingStateChanged);
+            _unsubCardInput = _eventService.Subscribe<HeroCardInputEvent>(OnHeroCardInputEvent);
         }
 
         public void UpdateState(float deltaTime)
@@ -80,7 +86,7 @@ namespace Renders
         {
             GameObject heroViewObj = Instantiate(opponentHeroCardPrefab, opponentHeroPanel);
             IHeroBattleCardView card = heroViewObj.GetComponent<IHeroBattleCardView>();
-            card.Render(heroModel, _eventService);
+            card.Render(heroModel, _eventService, true);
             return card;
         }
 
@@ -96,9 +102,23 @@ namespace Renders
             }
         }
 
+        void OnHeroCardInputEvent(HeroCardInputEvent inputEvent)
+        {
+            if (inputEvent.inputType == HeroCardInputEvent.InputType.Hold)
+            {
+                string id = inputEvent.card.GetHeroId();
+                IHeroModelAttribute model = inputEvent.isOpponentCard
+                    ? _gameController.GetRuntimeState().GetOpponentHeroModel(id)
+                    : _gameController.GetRuntimeState().GetPlayerHeroModel(id);
+                popupView.Render(model);
+            }
+        }
+
         public void Exit()
         {
             _unSubPlayingStateStarted();
+            _unsubCardInput();
+            parentCanvas.SetActive(false);
         }
 
         /// <summary>
@@ -126,7 +146,7 @@ namespace Renders
                 animCompleted = true;
             });
 
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(0.2f);
             targetView.UpdateHealth();
 
             while (!animCompleted)

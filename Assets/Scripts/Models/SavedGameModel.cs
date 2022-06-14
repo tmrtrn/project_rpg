@@ -18,6 +18,11 @@ namespace Models
         public List<SavedHeroModel> heroCollection;
 
         /// <summary>
+        /// Keeps opponent values in battle
+        /// </summary>
+        public List<SavedHeroModel> enemyHeroCollectionInBattle;
+
+        /// <summary>
         /// Player's team model for battle
         /// </summary>
         public string[] playerTeam;
@@ -30,25 +35,25 @@ namespace Models
         /// <summary>
         /// Active battle saved data
         /// </summary>
-        public bool IsPlayingBattle { get; set; }
+        public bool isPlayingBattle;
 
-        public int WhoisTurn { get; private set; }
-        public int TurnCounter { get; private set; }
+        public int whoisTurn;
+        public int turnCounter;
 
         /// <summary>
         /// move count of whois turn
         /// </summary>
-        public int Moves { get; private set; }
+        public int moves;
 
-        public int PlayedBattleCount { get; set; }
+        public int playedBattleCount;
 
 
         public void Reset()
         {
-            WhoisTurn = -1;
-            TurnCounter = 0;
-            IsPlayingBattle = false;
-            Moves = 0;
+            whoisTurn = -1;
+            turnCounter = 0;
+            isPlayingBattle = false;
+            moves = 0;
         }
 
 
@@ -141,7 +146,7 @@ namespace Models
 
         public int GetNextTurnSide()
         {
-            int next = WhoisTurn + 1;
+            int next = whoisTurn + 1;
             if (next >= PlayerCount)
             {
                 next = 0;
@@ -153,20 +158,20 @@ namespace Models
         public void EndTurn()
         {
             int next = GetNextTurnSide();
-            TurnCounter++;
-            WhoisTurn = next;
+            turnCounter++;
+            whoisTurn = next;
             // reset move count
-            Moves = GameConstants.MoveCountPerTurn;
+            moves = GameConstants.MoveCountPerTurn;
         }
 
         public bool IsTurnOver()
         {
-            return Moves == 0;
+            return moves == 0;
         }
 
         public void SetMoveSuccess()
         {
-            Moves = Math.Max(0, Moves - 1);
+            moves = Math.Max(0, moves - 1);
         }
 
     }

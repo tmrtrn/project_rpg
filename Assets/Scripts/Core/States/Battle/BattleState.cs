@@ -20,7 +20,7 @@ namespace Core.States.Battle
         /// </summary>
         private FiniteStateMachine _fsm;
 
-        private readonly GameController _gameController;
+        private readonly IGameController _gameController;
         private readonly IEventDispatcher _eventService;
         private readonly IAsyncService _asyncService;
 
@@ -30,7 +30,7 @@ namespace Core.States.Battle
         private IBattleRenderer[] _battleRenderers;
 
         public BattleState(
-            GameController gameController,
+            IGameController gameController,
             IEventDispatcher eventService,
             IAsyncService asyncService)
         {
@@ -56,6 +56,7 @@ namespace Core.States.Battle
 
             _battleRenderers = new IBattleRenderer[]
             {
+                new InitialBattleView(),
                 Object.FindObjectOfType<BattleView>(),
                 Object.FindObjectOfType<GameResultView>()
             };
@@ -63,10 +64,11 @@ namespace Core.States.Battle
             foreach (IBattleRenderer renderer in _battleRenderers)
             {
                 renderer.InjectServices(_gameController, _eventService);
-                renderer.Exit();
             }
 
             _fsmRenderer = new FiniteStateMachine(_battleRenderers);
+            _fsmRenderer.Change<InitialBattleView>(); // initial with empty render state
+
             _fsm.Change<PrePlayState>();
         }
 
@@ -99,7 +101,7 @@ namespace Core.States.Battle
             _commandWorker.Cancel();
         }
 
-        public GameController GameController => _gameController;
+        public IGameController GameController => _gameController;
         public IEventDispatcher EventService => _eventService;
         public IAsyncService AsyncService => _asyncService;
 
@@ -120,6 +122,7 @@ namespace Core.States.Battle
             if (_fsmRenderer.Current is BattleView battleView)
             {
                 yield return battleView.AttackToTarget(targetId, attacker, playerAttack, damage);
+                yield break;
             }
             Log.Error($"Can not attack in {_fsmRenderer.Current} render state ");
         }

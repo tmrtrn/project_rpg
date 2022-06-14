@@ -1,8 +1,10 @@
 using System;
+using Constants;
 using Core.Events;
 using Core.Services;
 using Core.Services.Event;
 using Core.Services.Logging;
+using Core.Services.Scene;
 using Core.Services.State;
 using Core.States.Battle;
 using Core.States.Initialize;
@@ -18,28 +20,34 @@ namespace Core.States
     public class GameStateService : IGameStateService
     {
         private readonly IEventDispatcher _eventDispatcher;
+        private readonly ISceneService _sceneService;
+        private readonly IGameController _gameController;
         /// <summary>
         /// Controls game states.
         /// </summary>
         private readonly FiniteStateMachine _fsm;
 
         private Action _unsubInit;
-        private Action _unSunLoading;
-        private Action _unsubBattleReady;
         private Action _unSubMenuCompleted;
+        private Action _unsubChangeScene;
 
-        public GameStateService(IEventDispatcher eventDispatcher, IState[] states)
+        public GameStateService(
+            IEventDispatcher eventDispatcher,
+            ISceneService sceneService,
+            IGameController gameController,
+            IState[] states)
         {
             _eventDispatcher = eventDispatcher;
+            _sceneService = sceneService;
+            _gameController = gameController;
             _fsm = new FiniteStateMachine(states);
         }
 
         public void Start()
         {
             _unsubInit = _eventDispatcher.Subscribe<GameInitializedEvent>(GameInitialized);
-            _unSunLoading = _eventDispatcher.Subscribe<LoadingCompletedEvent>(GameLoadingCompleted);
             _unSubMenuCompleted = _eventDispatcher.Subscribe<MenuCompletedEvent>(OnMenuCompletedEvent);
-            _unsubBattleReady = _eventDispatcher.Subscribe<BattleSceneLoadedEvent>(BattleIsReady);
+            _unsubChangeScene = _eventDispatcher.Subscribe<ChangeSceneEvent>(ChangeSceneReceived);
             _fsm.Change<InitializeGameState>();
         }
 
@@ -53,15 +61,6 @@ namespace Core.States
             _fsm.Change<LoadGameState>();
         }
 
-        /// <summary>
-        /// Called when the loading state is completed
-        /// </summary>
-        /// <param name="obj"></param>
-        private void GameLoadingCompleted(LoadingCompletedEvent obj)
-        {
-            Log.Info("Loading completed");
-            _fsm.Change<MenuState>();
-        }
 
         /// <summary>
         /// Called when battle button is pressed
@@ -74,21 +73,38 @@ namespace Core.States
         }
 
         /// <summary>
-        /// Called when battle scene is loaded
+        /// Triggers when scene loading is requested
         /// </summary>
-        /// <param name="loadedEvent"></param>
-        private void BattleIsReady(BattleSceneLoadedEvent loadedEvent)
+        /// <param name="request"></param>
+        private void ChangeSceneReceived(ChangeSceneEvent request)
         {
-            Log.Info("Battle is ready");
-            _fsm.Change<BattleState>();
+            Log.Info("Change scene is received");
+            // to exit active one, our exit methods may use the unity gameobjects
+            _fsm.Change<EmptyState>();
+
+            _eventDispatcher.SubscribeOnce<SceneLoaded>((loaded) =>
+            {
+                switch (loaded.SceneName)
+                {
+                    case GameConstants.SceneNameMenu:
+                        _fsm.Change<MenuState>();
+                        break;
+                    case GameConstants.SceneNameBattle:
+                        _fsm.Change<BattleState>();
+                        break;
+                    default:
+                        Log.Error($"undefined scene name: {loaded.SceneName}");
+                        break;
+                }
+            });
+            _sceneService.LoadScene(request.sceneName);
         }
 
         public void Stop()
         {
             _unsubInit();
-            _unSunLoading();
-            _unsubBattleReady();
             _unSubMenuCompleted();
+            _unsubChangeScene();
         }
 
         public void Update()
@@ -96,5 +112,18 @@ namespace Core.States
             _fsm.Update(Time.deltaTime);
         }
 
+        // save player progress
+        public void ApplicationPause(bool pauseStatus)
+        {
+            if (pauseStatus)
+            {
+                _gameController.SavePlayerProgress();
+            }
+        }
+
+        public void ApplicationQuit()
+        {
+            _gameController.SavePlayerProgress();
+        }
     }
 }

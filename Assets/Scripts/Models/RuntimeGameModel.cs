@@ -10,7 +10,7 @@ namespace Models
 {
     public class RuntimeGameModel
     {
-        private readonly GameController _gameController;
+        private readonly IGameController _gameController;
         private readonly SavedGameModel _savedGameModel;
 
         /// <summary>
@@ -23,7 +23,8 @@ namespace Models
         /// </summary>
         public List<HeroModel> EnemyHeroCollection { get; private set; }
 
-        public RuntimeGameModel(SavedGameModel savedGameModel, GameController gameController)
+
+        public RuntimeGameModel(SavedGameModel savedGameModel, IGameController gameController)
         {
             _savedGameModel = savedGameModel;
             _gameController = gameController;
@@ -31,6 +32,11 @@ namespace Models
             if (_savedGameModel == null)
             {
                 throw new NullReferenceException("Saved game progress is null");
+            }
+
+            if (savedGameModel.heroCollection.Count == 0)
+            {
+                throw new ArgumentException($"empty collection {nameof(savedGameModel.heroCollection)}");
             }
 
             PlayerHeroCollection = new List<HeroModel>(savedGameModel.heroCollection.Count);
@@ -46,6 +52,37 @@ namespace Models
                 }
                 AddHeroToPlayerCollection(heroAsset, savedHeroModel);
             }
+
+            if (savedGameModel.isPlayingBattle)
+            {
+                // create enemy inventory as well
+                List<SavedHeroModel> savedEnemyModels = savedGameModel.enemyHeroCollectionInBattle;
+
+                if (savedEnemyModels.Count == 0)
+                {
+                    throw new Exception("there should be an opponent");
+                }
+
+                EnemyHeroCollection = new List<HeroModel>(savedEnemyModels.Count);
+                for (int i = 0; i < savedEnemyModels.Count; i++)
+                {
+                    SavedHeroModel enemyHero = savedEnemyModels[i];
+                    if (!_gameController.GetHeroAssetById(enemyHero.Id, out var heroAsset))
+                    {
+                        string exception = $"Hero Db may be corrupted, {enemyHero.Id} ";
+                        Log.Error(exception);
+                        throw new Exception(exception);
+                    }
+
+                    var model = new HeroModel(heroAsset, enemyHero);
+                    EnemyHeroCollection.Add(model);
+                }
+            }
+        }
+
+        public SavedGameModel GetSaveFile()
+        {
+            return _savedGameModel;
         }
 
         public HeroModel GetPlayerHeroModel(string id)
@@ -109,6 +146,7 @@ namespace Models
             if (_gameController.FindNewHeroAssetExceptInventory(out var asset))
             {
                 SavedHeroModel savedHeroModel = _gameController.CreateSavedHeroData(asset);
+                _savedGameModel.heroCollection.Add(savedHeroModel);
                 newHeroModel = AddHeroToPlayerCollection(asset, savedHeroModel);
                 return true;
             }
@@ -198,7 +236,7 @@ namespace Models
 
         public bool HasActiveBattle()
         {
-            return _savedGameModel.IsPlayingBattle;
+            return _savedGameModel.isPlayingBattle;
         }
 
         public void CreateNewBattle()
@@ -209,6 +247,7 @@ namespace Models
 
             // create hero collection and it's team
             EnemyHeroCollection = new List<HeroModel>(capacity);
+            _savedGameModel.enemyHeroCollectionInBattle = new List<SavedHeroModel>(capacity);
             for (int i = 0; i < _savedGameModel.enemyTeam.Length; i++)
             {
                 bool found = _gameController.GetRandomHeroAsset(true,  true, out var heroAsset);
@@ -219,14 +258,19 @@ namespace Models
 
                 // select opponent's level by the player's team
                 (int minLevel, int maxLevel) = GetPlayerTeamLevelBounds();
-                int enemyLevel = Random.Range(minLevel, maxLevel + 1);
-                // first add to enemy collection to keep data
-                var model = new HeroModel(heroAsset, new SavedHeroModel()
+                int enemyLevel = Random.Range(maxLevel, maxLevel + 4);
+
+                SavedHeroModel saveHeroData = new SavedHeroModel()
                 {
                     Id = heroAsset.Id,
                     experience = 0,
                     level = enemyLevel,
-                });
+                };
+
+                // to keep in db
+                _savedGameModel.enemyHeroCollectionInBattle.Add(saveHeroData);
+                // first add to enemy collection to keep data
+                var model = new HeroModel(heroAsset, saveHeroData);
                 model.ResetHpForBattle();
                 EnemyHeroCollection.Add(model);
                 _savedGameModel.enemyTeam[i] = heroAsset.Id;
@@ -347,7 +391,7 @@ namespace Models
         /// <returns></returns>
         public bool IsPlayerTurn()
         {
-            return _savedGameModel.WhoisTurn == 0;
+            return _savedGameModel.whoisTurn == 0;
         }
 
         #endregion
@@ -360,18 +404,18 @@ namespace Models
 
         public void SetBattleStarted()
         {
-            _savedGameModel.IsPlayingBattle = true;
+            _savedGameModel.isPlayingBattle = true;
         }
 
         public void SetBattleOver()
         {
-            _savedGameModel.PlayedBattleCount++;
+            _savedGameModel.playedBattleCount++;
             _savedGameModel.Reset();
         }
 
         public int GetPlayedBattleCount()
         {
-            return _savedGameModel.PlayedBattleCount;
+            return _savedGameModel.playedBattleCount;
         }
     }
 }

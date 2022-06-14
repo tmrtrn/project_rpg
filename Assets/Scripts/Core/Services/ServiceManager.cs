@@ -26,7 +26,17 @@ namespace Core.Services
 
         private void OnDestroy()
         {
-            _gameStateService.Stop();
+            _gameStateService?.Stop();
+        }
+
+        private void OnApplicationPause(bool pauseStatus)
+        {
+            _gameStateService?.ApplicationPause(pauseStatus);
+        }
+
+        private void OnApplicationQuit()
+        {
+            _gameStateService?.ApplicationQuit();
         }
     }
 }

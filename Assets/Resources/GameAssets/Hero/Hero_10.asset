@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c43dc596e7849c18365498e95b6296a, type: 3}
-  m_Name: Hero_4
+  m_Name: Hero_10
   m_EditorClassIdentifier: 
-  _id: af85930c-9462-4e66-8687-332d91ec8934
+  _id: 9236c01d-df5e-4240-ad5d-2442794d56eb
   _attributes:
-    _name: Demogoblin
-    _health: 40
-    _attack: 8
+    _name: Violator
+    _health: 100
+    _attack: 15
   _viewAsset:
-    _view: {fileID: 21300000, guid: 223b41604d4d449489dbe3c5ffefeaac, type: 3}
-    _color: {r: 0.34045106, g: 0.29165727, b: 0.79663694, a: 1}
+    _view: {fileID: 21300000, guid: 21995c28efbbc473da1d30fdead612d6, type: 3}
+    _color: {r: 0.6624913, g: 0.3145736, b: 0.31688875, a: 1}

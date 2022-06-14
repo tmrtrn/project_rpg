@@ -1,4 +1,5 @@
 using System;
+using Constants;
 using Core.Events;
 using Core.Services.Data;
 using Core.Services.Event;
@@ -13,11 +14,11 @@ namespace Core.States.LoadGame
     /// </summary>
     public class LoadGameState : BaseGameState
     {
-        private readonly GameController _gameController;
+        private readonly IGameController _gameController;
         private readonly ISceneService _sceneService;
         private readonly IEventDispatcher _eventDispatcher;
 
-        public LoadGameState(GameController gameController, ISceneService sceneService, IEventDispatcher eventDispatcher)
+        public LoadGameState(IGameController gameController, ISceneService sceneService, IEventDispatcher eventDispatcher)
         {
             _gameController = gameController;
             _sceneService = sceneService;
@@ -28,56 +29,16 @@ namespace Core.States.LoadGame
         {
             base.Enter(context);
 
-            var waits = new Action<Action>[]
-            {
-                WaitForAssets,
-                WaitForSceneLoad
-            };
-
-            // waiting for all process to complete
-            var calls = 0;
-            Action callback = () =>
-            {
-                if (++calls == waits.Length)
-                {
-                    Log.Info( "all pre requires received. ");
-                    _eventDispatcher.Publish(new LoadingCompletedEvent());
-                }
-                else
-                {
-                    Log.Info( "Still waiting on {0}.", waits.Length - calls);
-                }
-            };
-
-            for (int i = 0, len = waits.Length; i < len; i++)
-            {
-                // subscribe to events
-                waits[i](callback);
-            }
-
-            _gameController.PreloadAssets();
-            _gameController.GenerateRuntimeData();
-            _sceneService.LoadScene("Main");
-        }
-
-        private void WaitForAssets(Action callback)
-        {
-            Log.Info("Waiting for assets");
             _eventDispatcher.SubscribeOnce<PreLoadAssetsEvent>(_ =>
             {
                 Log.Info("Hero assets received");
-                callback();
+                _gameController.GenerateRuntimeData();
+                string sceneNameToLoad = _gameController.HasActiveBattle()
+                    ? GameConstants.SceneNameBattle
+                    : GameConstants.SceneNameMenu;
+                _eventDispatcher.Publish(new ChangeSceneEvent(sceneNameToLoad));
             });
-        }
-
-        private void WaitForSceneLoad(Action callback)
-        {
-            Log.Info("Waiting for scene loading");
-            _eventDispatcher.SubscribeOnce<SceneLoaded>(_ =>
-            {
-                Log.Info("Scene is loaded");
-                callback();
-            });
+            _gameController.PreloadAssets();
         }
     }
 }

@@ -13,9 +13,9 @@ namespace Core.States.MainGame
     {
         private readonly ISceneService _sceneService;
         private readonly IEventDispatcher _eventDispatcher;
-        private readonly GameController _gameController;
+        private readonly IGameController _gameController;
 
-        public LoadBattleState(ISceneService sceneService, IEventDispatcher eventDispatcher, GameController gameController)
+        public LoadBattleState(ISceneService sceneService, IEventDispatcher eventDispatcher, IGameController gameController)
         {
             _sceneService = sceneService;
             _eventDispatcher = eventDispatcher;
@@ -26,15 +26,7 @@ namespace Core.States.MainGame
         {
             base.Enter(context);
 
-            _eventDispatcher.SubscribeOnce<SceneLoaded>(BattleSceneLoaded);
-            _sceneService.LoadScene(GameConstants.SceneNameBattle);
-        }
-
-        private void BattleSceneLoaded(SceneLoaded loadedEvent)
-        {
-            if (!loadedEvent.SceneName.Equals(GameConstants.SceneNameBattle)) return;
-            // just inform battle scene is ready
-            _eventDispatcher.Publish(new BattleSceneLoadedEvent());
+            _eventDispatcher.Publish(new ChangeSceneEvent(GameConstants.SceneNameBattle));
         }
     }
 }

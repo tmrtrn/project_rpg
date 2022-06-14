@@ -8,7 +8,7 @@ namespace Constants
         public const int EnemyHeroCount = 1;
         public const int PlayerCollectionHeroLimit = 10;
 
-        public const string SceneNameMenu = "Menu";
+        public const string SceneNameMenu = "Main";
         public const string SceneNameBattle = "Battle";
 
         public const int MoveCountPerTurn = 1;
