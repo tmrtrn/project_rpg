@@ -110,7 +110,7 @@ namespace Renders
                 IHeroModelAttribute model = inputEvent.isOpponentCard
                     ? _gameController.GetRuntimeState().GetOpponentHeroModel(id)
                     : _gameController.GetRuntimeState().GetPlayerHeroModel(id);
-                popupView.Render(model);
+                popupView.Render(model, true);
             }
         }
 

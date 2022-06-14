@@ -71,7 +71,7 @@ namespace Renders
         public void InputDown()
         {
             Log.Debug("Input down");
-            _inputHoldTimeout = Time.time + 3f;
+            _inputHoldTimeout = HoldTimeThresholdInSec;
         }
 
         /// <summary>
@@ -91,11 +91,14 @@ namespace Renders
 
         void Update()
         {
-            if (_inputHoldTimeout > 0 && Time.time > _inputHoldTimeout)
+            if (_inputHoldTimeout > 0)
             {
-                Log.Info("Input->hold card view ");
-                _inputHoldTimeout = 0;
-                _eventService.Publish(new HeroCardInputEvent(HeroCardInputEvent.InputType.Hold, this, isOpponentCard));
+                _inputHoldTimeout = Math.Max(0, _inputHoldTimeout - Time.deltaTime);
+                if (_inputHoldTimeout == 0)
+                {
+                    Log.Info("Input->hold card view ");
+                    _eventService.Publish(new HeroCardInputEvent(HeroCardInputEvent.InputType.Hold, this, isOpponentCard));
+                }
             }
         }
 

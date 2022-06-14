@@ -92,7 +92,7 @@ namespace Commands.Battle
             gameState.SetPlayerMoveSuccess();
 
             _battleState.AsyncService.BootstrapCoroutine(
-                _battleState.AttackToTarget(target.Id, attacker.Id, gameState.IsPlayerTurn(), 10),
+                _battleState.AttackToTarget(target.Id, attacker.Id, gameState.IsPlayerTurn(), attacker.AttackByLevel),
                 OnAttackAnimCompleted);
         }
 

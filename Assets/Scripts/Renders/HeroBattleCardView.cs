@@ -13,15 +13,20 @@ namespace Renders
         [SerializeField] private Transform _target;
         private HeroModel _heroModel;
 
-        public void Render(HeroModel heroModel, IEventDispatcher eventService, bool isOpponentCard = false)
+        public void Render(HeroModel heroModel, IEventDispatcher eventService, bool opponentCard = false)
         {
             _heroModel = heroModel;
-            base.isOpponentCard = isOpponentCard;
+            base.isOpponentCard = opponentCard;
             base.Render(heroModel.GetHeroAsset(), eventService, false);
             SetHealth(heroModel.GetCurrentHp(), heroModel.FullHealth, false);
         }
 
         public Transform TargetPoint => _target;
+
+        public HeroCardView GetView()
+        {
+            return this;
+        }
 
         public void UpdateHealth()
         {

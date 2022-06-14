@@ -15,7 +15,7 @@ namespace Core.States.Battle
         void ChangeState<T>(object context = null) where T : IState;
         IState CurrentState { get; }
         IEnumerator AttackToTarget(string targetId, string attacker, bool playerAttack, float damage);
-        bool AddCommand(ICommandItem item);
+        bool AddCommand(ICommandItem item, bool checkClear = true);
         void ClearCommands();
         void ChangeRenderState<T>() where T : IBattleRenderer;
     }

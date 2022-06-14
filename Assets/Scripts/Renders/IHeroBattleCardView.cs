@@ -11,5 +11,6 @@ namespace Renders
         Transform TargetPoint { get; }
         void Select();
         void Deselect();
+        HeroCardView GetView();
     }
 }

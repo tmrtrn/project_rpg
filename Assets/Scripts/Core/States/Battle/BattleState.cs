@@ -80,10 +80,10 @@ namespace Core.States.Battle
             _commandWorker.RunUpdate(deltaTime);
         }
 
-        public bool AddCommand(ICommandItem item)
+        public bool AddCommand(ICommandItem item, bool checkClear = true)
         {
             // command queue is in process
-            if (!_commandWorker.ClearProceed()) return false;
+            if (checkClear && !_commandWorker.ClearProceed()) return false;
             _commandWorker.AddCommand(item);
             return true;
         }

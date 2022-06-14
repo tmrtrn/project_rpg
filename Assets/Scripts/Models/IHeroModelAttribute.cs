@@ -8,5 +8,6 @@ namespace Models
         public float FullHealth { get; }
         public float AttackByLevel { get; }
         public int Experience { get; }
+        float GetCurrentHp();
     }
 }

@@ -61,7 +61,7 @@ namespace Renders
 
         public void RenderCardInfoPopup(string heroId)
         {
-            popupView.Render(_runtimeGameState.GetPlayerHeroModel(heroId));
+            popupView.Render(_runtimeGameState.GetPlayerHeroModel(heroId), false);
         }
 
         public void UpdateBattleButtonState()
